@@ -17,23 +17,23 @@ final class Announcement: Model {
     
     @Field(key: "title")
     var title: String
-    
+
     @Field(key: "content")
     var content: String
     
-    @Field(key: "date")
-    var date: Date
+    @Timestamp(key: "created_at", on: .create)
+    var createdAt: Date?
     
     @Timestamp(key: "deleted_at", on: .delete)
     var deletedAt: Date?
     
     init() { }
     
-    init(id: UUID, title: String, content: String, date: Date) {
-        self.id = id
+    init(id: UUID? = UUID(), title: String, content: String, createdAt: Date? = Date(), deletedAt: Date? = nil) {
         self.title = title
         self.content = content
-        self.date = date
+        self.createdAt = createdAt
+        self.deletedAt = deletedAt
     }
 }
 
