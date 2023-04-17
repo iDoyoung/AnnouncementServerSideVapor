@@ -15,11 +15,21 @@ struct AnnouncementController: RouteCollection {
     }
     
     func getAllHandler(_ req: Request) async throws -> [Announcement] {
-        try await Announcement.query(on: req.db).all()
+        print("Header: \(req.headers)")
+        //FIXME: Be Better
+        let id = req.headers["X-Did-Client-Id"].first
+        if id != "TeStHeAdEr" {
+            throw Abort(.nonAuthoritativeInformation)
+        }
+        return try await Announcement.query(on: req.db).all()
     }
     
     func createHandler(_ req: Request) async throws -> Announcement {
         let announcement = try req.content.decode(Announcement.self)
+        let id = req.headers["X-Did-Client-Id"].first
+        if id != "TeStHeAdEr" {
+            throw Abort(.nonAuthoritativeInformation)
+        }
         try await announcement.save(on: req.db)
         return announcement
     }
