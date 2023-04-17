@@ -6,7 +6,6 @@
 //
 
 import Vapor
-import Fluent
 
 struct AnnouncementController: RouteCollection {
     func boot(routes: Vapor.RoutesBuilder) throws {
@@ -15,13 +14,13 @@ struct AnnouncementController: RouteCollection {
         announcementRoutes.post("announcement", use: createHandler)
     }
     
-    func getAllHandler(_ req: Request) -> EventLoopFuture<[Announcement]> {
-        return Announcement.query(on: req.db).all()
+    func getAllHandler(_ req: Request) async throws -> [Announcement] {
+        try await Announcement.query(on: req.db).all()
     }
     
-    func createHandler(_ req: Request) throws -> EventLoopFuture<Announcement> {
-        let data = try req.content.decode(Announcement.self)
-        let announcement = Announcement(title: data.title, content: data.content)
-        return announcement.save(on: req.db).map { announcement }
+    func createHandler(_ req: Request) async throws -> Announcement {
+        let announcement = try req.content.decode(Announcement.self)
+        try await announcement.save(on: req.db)
+        return announcement
     }
 }
