@@ -12,10 +12,10 @@ struct AnnouncementController: RouteCollection {
         let announcementRoutes = routes.grouped("announcements")
         announcementRoutes.get(use: getAllHandler)
         announcementRoutes.post("new", use: createHandler)
+        announcementRoutes.delete(":id", use: deleteHandler)
     }
     
     func getAllHandler(_ req: Request) async throws -> [Announcement] {
-        print("Header: \(req.headers)")
         //FIXME: Be Better
 //        let id = req.headers["X-Did-Client-Id"].first
 //        if id != "TeStHeAdEr" {
@@ -32,5 +32,13 @@ struct AnnouncementController: RouteCollection {
 //        }
         try await announcement.save(on: req.db)
         return announcement
+    }
+    
+    func deleteHandler(_ req: Request) async throws -> String {
+        guard let announcement = try await Announcement.find(req.parameters.get("id"), on: req.db) else {
+            throw Abort(.notFound)
+        }
+        try await announcement.delete(on: req.db)
+        return announcement.title
     }
 }
