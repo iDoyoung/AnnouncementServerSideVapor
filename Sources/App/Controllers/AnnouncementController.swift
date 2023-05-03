@@ -24,14 +24,15 @@ struct AnnouncementController: RouteCollection {
         return try await Announcement.query(on: req.db).all()
     }
     
-    func createHandler(_ req: Request) async throws -> Announcement {
+    func createHandler(_ req: Request) async throws -> HTTPStatus {
         let announcement = try req.content.decode(Announcement.self)
 //        let id = req.headers["X-Did-Client-Id"].first
 //        if id != "TeStHeAdEr" {
 //            throw Abort(.nonAuthoritativeInformation)
 //        }
-        try await announcement.save(on: req.db)
-        return announcement
+//        try await announcement.save(on: req.db)
+        try await announcement.create(on: req.db)
+        return .created
     }
     
     func deleteHandler(_ req: Request) async throws -> String {
